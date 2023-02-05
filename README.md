@@ -1,4 +1,4 @@
-# RankChat
+# RankChat (BETA)
 ## Commands
 
 * `/chat` - `Send message to player.`
