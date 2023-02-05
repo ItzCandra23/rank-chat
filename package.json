@@ -1,0 +1,14 @@
+{
+    "name": "@bdsx/rank-chat",
+    "description": "This plugin for BDSX",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "ISC",
+    "keywords": [ "rank-chat", "rank-perms", "BDSX" ],
+    "author": "ItzCandra23",
+    "homepage": "https://github.com/ItzCandra23/rank-perms",
+    "bdsxPlugin": true,
+    "devDependencies": {
+      "bdsx": "file:../bdsx"
+    }
+}

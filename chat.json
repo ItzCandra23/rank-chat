@@ -1,0 +1,11 @@
+{
+  "default": "§8[%rank%§8] §f%name%: §a%msg%",
+  "toPlayer": {
+    "console": "<[%rank1%] You >> [%rank2%] %name%>: %msg%",
+    "player": "§8<§7[%rank1%§7] §fYou §ato §7[%rank2%§7] §f%name2%§8>§c: §6%msg%",
+    "target": "§8<§7[%rank1%§7] §f%name1% §ato §7[%rank2%§7] §fYou§8>§c: §6%msg%"
+  },
+  "ranks": {},
+  "autopermissions": true,
+  "sendToConsole": true
+}
