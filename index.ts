@@ -5,6 +5,7 @@ import { TextPacket } from "bdsx/bds/packets";
 import { Permissions } from "@bdsx/rank-perms";
 import { Ranks } from "@bdsx/rank-perms/src";
 import { send } from "./src/utils/message";
+import { CANCEL } from "bdsx/common";
 import * as path from "path";
 import * as fs from "fs";
 
@@ -14,23 +15,25 @@ const configPath = path.join(__dirname, "chat.json");
 let config: {
     default: string;
     toPlayer: {
-        console: string;
+        console?: string;
         player: string;
         target: string;
     };
     ranks: Record<string, string>;
-    autopermissions: boolean;
-    sendToConsole: boolean;
+    console?: string;
 } = {
-    default: "§8[%rank%§8] §f%name%: §a%msg%",
+    default: "§8[§a%rank%§8] §f%name%: §a%msg%",
     toPlayer: {
+        player: "§8<§7[§a%rank1%§7] §fYou §ato §7[§a%rank2%§7] §f%name2%§8>§c: §6%msg%",
+        target: "§8<§7[§a%rank1%§7] §f%name1% §ato §7[§a%rank2%§7] §fYou§8>§c: §6%msg%",
         console: "<[%rank1%] You >> [%rank2%] %name%>: %msg%",
-        player: "§8<§7[%rank1%§7] §fYou §ato §7[%rank2%§7] §f%name2%§8>§c: §6%msg%",
-        target: "§8<§7[%rank1%§7] §f%name1% §ato §7[%rank2%§7] §fYou§8>§c: §6%msg%",
     },
-    ranks: {},
-    autopermissions: true,
-    sendToConsole: true,
+    ranks: {
+        Guest: "§8[§r%rank%§8] §f%name%: §a%msg%",
+        Admin: "§8[§r%rank%§8] §f%name%: §d%msg%",
+        Owner: "§8[§r%rank%§8] §f%name%: §c%msg%",
+    },
+    console: "[%rank%] %name%: %msg%",
 };
 
 try { config = require(configPath) } catch(err) {}
@@ -47,12 +50,6 @@ export namespace RankChatMain {
         return true;
     }
 
-    /**Get config rank chat */
-    export function getRankChat(rank: string): string {
-        if (!config.ranks.hasOwnProperty(rank)) return config.default.replace(/&/g, "§");
-        return config.ranks[rank].replace(/&/g, "§");
-    }
-
     /**
      * Customize config chat.
      * @description example: "[%rank%] %name%: %msg%"
@@ -62,6 +59,12 @@ export namespace RankChatMain {
         if (!chat.includes("%name%")&&!chat.includes("%msg%")) return false;
         config.default=chat;
         return true;
+    }
+
+    /**Get config rank chat */
+    export function getRankChat(rank: string): string {
+        if (!config.ranks.hasOwnProperty(rank)) return config.default.replace(/&/g, "§");
+        return config.ranks[rank].replace(/&/g, "§");
     }
 
     /**Get config chat */
@@ -74,15 +77,20 @@ export namespace RankChatMain {
         const username = player.getNameTag();
         const message = chat.replace(/§/g, "");
         let msg = getRankChat(Permissions.getRank(player));
-        return msg.replace(/%rank%/g, rank).replace(/%name%/g, username).replace(/%msg%/g, msg);
+        return msg.replace(/%rank%/g, rank).replace(/%name%/g, username).replace(/%msg%/g, message);
+    }
+
+    export function sendChatToConsole(player: ServerPlayer, chat: string): void {
+        const rank = Permissions.getRank(player);
+        const username = player.getNameTag();
+        const message = chat.replace(/§/g, "");
+        const msg = config.console;
+        if (!msg) return;
+        send.msg(msg.replace(/%rank%/g, rank).replace(/%name%/g, username).replace(/%msg%/g, message));
     }
 
     export function getMsg() {
         return config.toPlayer;
-    }
-
-    export function isAutoPerms(): boolean {
-        return config.autopermissions;
     }
 
     export function ChatPlayer(player: ServerPlayer|undefined, target: ServerPlayer, message: string): void {
@@ -104,8 +112,13 @@ export namespace RankChatMain {
             const rank2 = Permissions.getRank(target);
             const display1 = Ranks.getDisplay(rank1)+"§r" ?? rank1;
             const display2 = Ranks.getDisplay(rank2)+"§r" ?? rank2;
-            const msg1 = getMsg().console.replace("%rank1%", display1).replace("%rank2%", display2).replace("%name1%", "Server").replace("%name2%", target.getNameTag()).replace("%msg%", message);
+
+            const console = getMsg().console;
+            if (!console) return;
+
+            const msg1 = console.replace("%rank1%", rank1).replace("%rank2%", rank2).replace("%name1%", "Server").replace("%name2%", target.getNameTag()).replace("%msg%", message);
             const msg2 = getMsg().target.replace("%rank1%", display1).replace("%rank2%", display2).replace("%name1%", "Server").replace("%name2%", target.getNameTag()).replace("%msg%", message);
+
             send.msg(msg1);
             target.sendMessage(msg2);
         }
@@ -123,8 +136,6 @@ export namespace RankChatMain {
         }
     }
 
-    export let sendToConsole = config.sendToConsole;
-
     /**Save. */
     export function save(message: boolean = false): void {
         fs.writeFile(configPath, JSON.stringify(config, null, 2), "utf8", (err) => {
@@ -139,18 +150,20 @@ export namespace RankChatMain {
     }
 }
 
-events.packetBefore(MinecraftPacketIds.Text).on((pkt, ni) => {
-    const player = ni.getActor();
-    if (!player) return;
+events.packetSend(MinecraftPacketIds.Text).on((pkt, netId) => {
+    if (pkt.type !== TextPacket.Types.Chat) return;
 
-    pkt.type=TextPacket.Types.Chat;
-    pkt.name="";
+    pkt.type = TextPacket.Types.Raw;
+
+    const player = netId.getActor();
+    if (!player) return CANCEL;
+
+    RankChatMain.sendChatToConsole(player, pkt.message);
     pkt.message = RankChatMain.getPlayerChat(player, pkt.message);
-    if (config.sendToConsole) send.msg(`<${Permissions.getRank(player)}> ${player.getNameTag()}: ${pkt.message}`);
 });
 
 events.serverOpen.on(() => {
-    require("./src/commands");
+    require("./src");
     send.success("Started!");
 });
 
