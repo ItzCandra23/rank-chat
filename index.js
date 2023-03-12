@@ -71,7 +71,7 @@ var RankChatMain;
     function getPlayerChat(player, chat) {
         var _a;
         const rank = (_a = src_1.Ranks.getDisplay(rank_perms_1.Permissions.getRank(player)) + "§r") !== null && _a !== void 0 ? _a : rank_perms_1.Permissions.getRank(player);
-        const username = player.getNameTag();
+        const username = player.getName();
         const message = chat.replace(/§/g, "");
         let msg = getRankChat(rank_perms_1.Permissions.getRank(player));
         return msg.replace(/%rank%/g, rank).replace(/%name%/g, username).replace(/%msg%/g, message);
@@ -79,7 +79,7 @@ var RankChatMain;
     RankChatMain.getPlayerChat = getPlayerChat;
     function sendChatToConsole(player, chat) {
         const rank = rank_perms_1.Permissions.getRank(player);
-        const username = player.getNameTag();
+        const username = player.getName();
         const message = chat.replace(/§/g, "");
         const msg = config.console;
         if (!msg)
@@ -94,14 +94,14 @@ var RankChatMain;
     function ChatPlayer(player, target, message) {
         var _a, _b, _c, _d;
         if (player) {
-            if (player.getNameTag() === target.getNameTag()) {
+            if (player.getName() === target.getName()) {
                 player.sendMessage(`§cYou cant send message to yourself`);
                 return;
             }
             const rank1 = (_a = src_1.Ranks.getDisplay(rank_perms_1.Permissions.getRank(player)) + "§r") !== null && _a !== void 0 ? _a : rank_perms_1.Permissions.getRank(player);
             const rank2 = (_b = src_1.Ranks.getDisplay(rank_perms_1.Permissions.getRank(target)) + "§r") !== null && _b !== void 0 ? _b : rank_perms_1.Permissions.getRank(target);
-            const msg1 = getMsg().player.replace("%rank1%", rank1).replace("%rank2%", rank2).replace("%name1%", player.getNameTag()).replace("%name2%", target.getNameTag()).replace("%msg%", message);
-            const msg2 = getMsg().target.replace("%rank1%", rank1).replace("%rank2%", rank2).replace("%name1%", player.getNameTag()).replace("%name2%", target.getNameTag()).replace("%msg%", message);
+            const msg1 = getMsg().player.replace("%rank1%", rank1).replace("%rank2%", rank2).replace("%name1%", player.getName()).replace("%name2%", target.getName()).replace("%msg%", message);
+            const msg2 = getMsg().target.replace("%rank1%", rank1).replace("%rank2%", rank2).replace("%name1%", player.getName()).replace("%name2%", target.getName()).replace("%msg%", message);
             player.sendMessage(msg1);
             target.sendMessage(msg2);
             replay.set(target, player);
@@ -114,8 +114,8 @@ var RankChatMain;
             const console = getMsg().console;
             if (!console)
                 return;
-            const msg1 = console.replace("%rank1%", rank1).replace("%rank2%", rank2).replace("%name1%", "Server").replace("%name2%", target.getNameTag()).replace("%msg%", message);
-            const msg2 = getMsg().target.replace("%rank1%", display1).replace("%rank2%", display2).replace("%name1%", "Server").replace("%name2%", target.getNameTag()).replace("%msg%", message);
+            const msg1 = console.replace("%rank1%", rank1).replace("%rank2%", rank2).replace("%name1%", "Server").replace("%name2%", target.getName()).replace("%msg%", message);
+            const msg2 = getMsg().target.replace("%rank1%", display1).replace("%rank2%", display2).replace("%name1%", "Server").replace("%name2%", target.getName()).replace("%msg%", message);
             message_1.send.msg(msg1);
             target.sendMessage(msg2);
         }
