@@ -35,7 +35,6 @@ let config: {
         Admin: "§8[§r%rank%§8] §f%name%: §d%msg%",
         Owner: "§8[§r%rank%§8] §f%name%: §c%msg%",
     },
-    console: "[%rank%] %name%: %msg%",
 };
 
 try { config = require(configPath) } catch(err) {}
@@ -166,22 +165,11 @@ function PlayerByXuid(xuid: string): ServerPlayer|null {
 }
 
 events.packetSend(MinecraftPacketIds.Text).on((pkt, netId) => {
-
-    const player = netId.getActor();
-    if (!player) return;
-
-    if (config.console) {
-        const rank = Permissions.getRank(player);
-        send.msg(config.console.replace(/%rank%/g, rank).replace(/%name%/g, pkt.name).replace(/%msg%/g, pkt.message));
-    }
-});
-
-events.packetSend(MinecraftPacketIds.Text).on((pkt, netId) => {
     if (pkt.type !== TextPacket.Types.Chat) return;
 
     pkt.type = TextPacket.Types.Raw;
 
-    const player = PlayerByName(pkt.name);
+    const player = PlayerByXuid(pkt.xboxUserId);
     if (!player) return;
 
     const rank = Ranks.getDisplay(Permissions.getRank(player))+"§r" ?? Permissions.getRank(player);
