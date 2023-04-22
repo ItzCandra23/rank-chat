@@ -9,6 +9,5 @@
     "Guest": "§8[§r%rank%§8] §f%name%: §a%msg%",
     "Admin": "§8[§r%rank%§8] §f%name%: §d%msg%",
     "Owner": "§8[§r%rank%§8] §f%name%: §c%msg%"
-  },
-  "console": "[%rank%] %name%: %msg%"
+  }
 }
