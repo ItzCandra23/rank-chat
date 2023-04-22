@@ -9,3 +9,7 @@
 * `/chat` - `rank-chat.command.chat`
 * `/replay` - `rank-chat.command.replay`
 * `/setchat` - `rank-chat.command.setchat`
+
+## Changelog
+* Fixed Fatal Bugs
+* Add Filters Feature

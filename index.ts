@@ -8,6 +8,8 @@ import { send } from "./src/utils/message";
 import { CANCEL } from "bdsx/common";
 import * as path from "path";
 import * as fs from "fs";
+import { FiltersChat } from "./src/filter";
+import { bedrockServer } from "bdsx/launcher";
 
 const replay = new Map<ServerPlayer, ServerPlayer>();
 
@@ -150,16 +152,42 @@ export namespace RankChatMain {
     }
 }
 
+function PlayerByName(name: string): ServerPlayer|undefined {
+    const players = bedrockServer.serverInstance.getPlayers();
+
+    for (const [i, player] of players.entries()) {
+        if (player.getName().toLowerCase() !== name.toLowerCase()) return undefined;
+        else return player;
+    }
+}
+
+function PlayerByXuid(xuid: string): ServerPlayer|null {
+    return bedrockServer.level.getPlayerByXuid(xuid);
+}
+
+events.packetSend(MinecraftPacketIds.Text).on((pkt, netId) => {
+
+    const player = netId.getActor();
+    if (!player) return;
+
+    if (config.console) {
+        const rank = Permissions.getRank(player);
+        send.msg(config.console.replace(/%rank%/g, rank).replace(/%name%/g, pkt.name).replace(/%msg%/g, pkt.message));
+    }
+});
+
 events.packetSend(MinecraftPacketIds.Text).on((pkt, netId) => {
     if (pkt.type !== TextPacket.Types.Chat) return;
 
     pkt.type = TextPacket.Types.Raw;
 
-    const player = netId.getActor();
-    if (!player) return CANCEL;
+    const player = PlayerByName(pkt.name);
+    if (!player) return;
 
-    RankChatMain.sendChatToConsole(player, pkt.message);
-    pkt.message = RankChatMain.getPlayerChat(player, pkt.message);
+    const rank = Ranks.getDisplay(Permissions.getRank(player))+"§r" ?? Permissions.getRank(player);
+    let msg = RankChatMain.getRankChat(Permissions.getRank(player));
+
+    pkt.message = msg.replace(/%rank%/g, rank).replace(/%name%/g, pkt.name).replace(/%msg%/g, FiltersChat.filter(pkt.message));
 });
 
 events.serverOpen.on(() => {
