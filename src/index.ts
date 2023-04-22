@@ -1,7 +1,7 @@
 import { commandPerm } from "@bdsx/rank-perms/src/command";
 import { CommandPermissionLevel, PlayerCommandSelector } from "bdsx/bds/command";
 import { CxxString } from "bdsx/nativetype";
-import { Permission, Ranks } from "@bdsx/rank-perms/src";
+import { Ranks } from "@bdsx/rank-perms/src";
 import { send, sendMessage } from "./utils/message";
 import { RankChatMain } from "..";
 import { command } from "bdsx/command";
@@ -25,7 +25,7 @@ commandPerm.register("chat", "Send message to other player", "rank-chat.command.
     message: CxxString,
 });
 
-commandPerm.register("replay", "Send message to last player who chatted with you.", "rank-chat.command.replay")
+commandPerm.register("replay", "Send message to last player who chatted with you.", "rank-chat.command.replay", CommandPermissionLevel.Normal)
 .overload((p, o) => {
     const actor = o.getEntity()?.getNetworkIdentifier().getActor();
     if (actor === null) return;
@@ -39,7 +39,7 @@ commandPerm.register("replay", "Send message to last player who chatted with you
     message: CxxString,
 });
 
-commandPerm.register("r", "Send message to last player who chatted with you.", "rank-chat.command.replay")
+commandPerm.register("r", "Send message to last player who chatted with you.", "rank-chat.command.replay", CommandPermissionLevel.Normal)
 .overload((p, o) => {
     const actor = o.getEntity()?.getNetworkIdentifier().getActor();
     if (actor === null) return;
