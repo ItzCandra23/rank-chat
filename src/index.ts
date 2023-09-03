@@ -1,8 +1,8 @@
 import { commandPerm } from "@bdsx/rank-perms/src/command";
 import { CommandPermissionLevel, PlayerCommandSelector } from "bdsx/bds/command";
 import { CxxString } from "bdsx/nativetype";
-import { Ranks } from "@bdsx/rank-perms/src";
-import { send, sendMessage } from "./utils/message";
+import { RankPerms } from "@bdsx/rank-perms";
+import { send } from "./utils/message";
 import { RankChatMain } from "..";
 import { command } from "bdsx/command";
 
@@ -57,12 +57,11 @@ commandPerm.register("setchat", "Customize rank chat.", "rank-chat.command.setch
 .overload((p, o) => {
     const actor = o.getEntity()?.getNetworkIdentifier().getActor();
     if (actor === null) return;
-    const send = new sendMessage(actor);
-    if (!Ranks.has(p.rank)) {
-        send.error(`Rank not found!`);
+    if (!RankPerms.hasRank(p.rank)) {
+        send.error(`Rank not found!`, actor);
         return;
     }
-    send.success(`Success to set ${p.rank} chat`);
+    send.success(`Success to set ${p.rank} chat`, actor);
     RankChatMain.setRankChat(p.rank, p.chat);
 }, {
     isrank: command.enum("RankChat_rank", "rank"),
@@ -72,8 +71,7 @@ commandPerm.register("setchat", "Customize rank chat.", "rank-chat.command.setch
 .overload((p, o) => {
     const actor = o.getEntity()?.getNetworkIdentifier().getActor();
     if (actor === null) return;
-    const send = new sendMessage(actor);
-    send.success(`Success to set default chat`);
+    send.success(`Success to set default chat`, actor);
     RankChatMain.setDefaultChat(p.chat);
 }, {
     isrank: command.enum("RankChat_default", "default"),

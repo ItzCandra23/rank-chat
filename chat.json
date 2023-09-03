@@ -1,13 +1,13 @@
 {
-  "default": "§8[§a%rank%§8] §f%name%: §a%msg%",
+  "default": "§8[§a{rank}§8] §f{name}: §a{msg}",
   "toPlayer": {
-    "player": "§8<§7[§a%rank1%§7] §fYou §ato §7[§a%rank2%§7] §f%name2%§8>§c: §6%msg%",
-    "target": "§8<§7[§a%rank1%§7] §f%name1% §ato §7[§a%rank2%§7] §fYou§8>§c: §6%msg%",
-    "console": "<[%rank1%] You >> [%rank2%] %name%>: %msg%"
+    "player": "§8<§7[§a{rank1}§7] §fYou §ato §7[§a{rank2}§7] §f{name2}§8>§c: §6{msg}",
+    "target": "§8<§7[§a{rank1}§7] §f{name1} §ato §7[§a{rank2}§7] §fYou§8>§c: §6{msg}",
+    "console": "<[{rank1}] You >> [{rank2}] {name}>: {msg}"
   },
   "ranks": {
-    "Guest": "§8[§r%rank%§8] §f%name%: §a%msg%",
-    "Admin": "§8[§r%rank%§8] §f%name%: §d%msg%",
-    "Owner": "§8[§r%rank%§8] §f%name%: §c%msg%"
+    "Guest": "§8[§r{rank}§8] §f{name}: §a{msg}",
+    "Admin": "§8[§r{rank}§8] §f{name}: §d{msg}",
+    "Owner": "§8[§r{rank}§8] §f{name}: §c{msg}"
   }
 }
